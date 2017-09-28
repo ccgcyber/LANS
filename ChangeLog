@@ -1,0 +1,6 @@
+Graph-Simulation-6:
+===========================================================================
+- Automation of validation report (works for single scenario only)
+- Validation of malicious netflows (need improvement in GS-7)
+- Organize the code and add meaningful comments
+- Netflows ordered by starttime at simulated graph

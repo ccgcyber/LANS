@@ -1,0 +1,32 @@
+#PBS -N Full_GS5
+#PBS -l nodes=4:ppn=20
+#PBS -q dasispecial
+#PBS -l walltime=96:00:00
+cd $PBS_O_WORKDIR
+
+python create_configuration.py
+python create_spark_configuration.py
+
+echo '>> Start of Script'
+#export SPARK_HOME=/work/fz56/Spark_Software/spark-2.1.0-bin-hadoop2.7
+nodes=($( cat $PBS_NODEFILE | sort | uniq | cut -d '.' -f 1 ))
+nnodes=${#nodes[@]}
+last=$(($nnodes - 1))
+SPARK_MASTER_IP=$HOSTNAME
+$SPARK_HOME/sbin/start-master.sh
+
+echo "Master created on $HOSTNAME"
+
+for i in $( seq 0 $last )
+do
+    ssh ${nodes[$i]} "$SPARK_HOME/sbin/start-slave.sh spark://$SPARK_MASTER_IP:7077"
+    echo "Worker $i started on ${nodes[$i]}"
+done
+echo 'All Workers Started'
+./Spark_Config.sh
+Rscript --vanilla CombineCSV.R
+python role_mining.py
+mpirun -n 80 python parallel_parameter_estimation_v5.py
+python create_2D_edge_attribute_histograms.py
+mpirun -n 80 python Enterprise_Connection_With_Graph_Simulation.py
+python SimulationValidation.py
