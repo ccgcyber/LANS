@@ -1,5 +1,4 @@
-__author__ = 'fz56@msstate.edu'
-__author__ = 'chrisl@dasi.msstate.edu'
+__author__ = 'CCG'
 
 import networkx as nx
 from random import choice, shuffle, seed, sample, randint
